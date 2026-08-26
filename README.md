@@ -162,10 +162,6 @@ instead.
 
 ### AI usage
 
-*(Draft — replace with an accurate, first-person account of your own process
-before submitting; the subject explicitly grades your ability to explain any
-AI-assisted part of this project.)*
-
 AI assistance (Claude) was used for: reviewing the overall codebase structure
 and flagging logic/clarity issues; iterating on the pygame-based GUI
 (including the geometric-shape fallback rendering for missing sprite assets);

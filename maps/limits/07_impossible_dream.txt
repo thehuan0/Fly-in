@@ -1,0 +1,68 @@
+nb_drones: 25
+start_hub: start 0 5 [color=green]
+end_hub: finish 20 5 [color=yellow]
+
+# The Siren's Call (Priority traps leading to a bottleneck)
+hub: siren1 2 8 [zone=priority color=orange max_drones=6]
+hub: siren2 4 8 [zone=priority color=orange max_drones=6]
+hub: tar_pit 8 8 [zone=restricted color=red max_drones=10]
+hub: escape_hatch 10 9 [zone=normal color=blue max_drones=1]
+
+# The Needle (Fastest, but 1-capacity choke)
+hub: n1 3 5 [zone=normal color=blue max_drones=1]
+hub: n2 5 5 [zone=normal color=blue max_drones=1]
+hub: n3 7 5 [zone=normal color=blue max_drones=1]
+hub: n4 9 5 [zone=normal color=blue max_drones=1]
+
+# The Grind (High capacity, but very slow)
+hub: g1 2 2 [zone=restricted color=purple max_drones=8]
+hub: g2 6 2 [zone=restricted color=purple max_drones=8]
+hub: g3 10 2 [zone=restricted color=purple max_drones=8]
+hub: g4 14 2 [zone=restricted color=purple max_drones=8]
+
+# The Maze (Normal cost, tangled, blocked nodes)
+hub: m_in 10 5 [zone=normal color=blue max_drones=4]
+hub: m_blk1 12 7 [zone=blocked color=black]
+hub: m_a 12 5 [zone=normal color=blue max_drones=3]
+hub: m_blk2 14 6 [zone=blocked color=black]
+hub: m_b 14 4 [zone=normal color=blue max_drones=3]
+hub: m_c 16 5 [zone=normal color=blue max_drones=4]
+
+# Convergence
+hub: choke_out 18 5 [zone=restricted color=red max_drones=4]
+
+# Connections
+connection: start-siren1 [max_link_capacity=6]
+connection: siren1-siren2 [max_link_capacity=6]
+connection: siren2-tar_pit [max_link_capacity=6]
+connection: tar_pit-escape_hatch [max_link_capacity=1]
+connection: escape_hatch-m_a [max_link_capacity=1]
+
+connection: start-n1 [max_link_capacity=1]
+connection: n1-n2 [max_link_capacity=1]
+connection: n2-n3 [max_link_capacity=1]
+connection: n3-n4 [max_link_capacity=1]
+connection: n4-m_in [max_link_capacity=1]
+
+connection: start-g1 [max_link_capacity=8]
+connection: g1-g2 [max_link_capacity=8]
+connection: g2-g3 [max_link_capacity=8]
+connection: g3-g4 [max_link_capacity=8]
+connection: g4-m_c [max_link_capacity=8]
+
+# Cross-links (to allow dynamic rerouting)
+connection: n2-g2 [max_link_capacity=2]
+connection: siren2-n3 [max_link_capacity=1]
+connection: g3-m_in [max_link_capacity=3]
+
+# Maze Routing
+connection: m_in-m_blk1
+connection: m_in-m_a [max_link_capacity=3]
+connection: m_a-m_blk2
+connection: m_a-m_b [max_link_capacity=3]
+connection: m_b-m_c [max_link_capacity=3]
+connection: m_a-m_c [max_link_capacity=2]
+
+# Final Stretch
+connection: m_c-choke_out [max_link_capacity=4]
+connection: choke_out-finish [max_link_capacity=4]

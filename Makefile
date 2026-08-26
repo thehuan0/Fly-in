@@ -1,51 +1,31 @@
+.PHONY: all help install run debug clean lint lint-strict
+
 VENV = venv
-PYTHON = $(VENV)/bin/python
+PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
+FLAKE8 = $(VENV)/bin/flake8
+MYPY = $(VENV)/bin/mypy
 
-MAIN_FILE = fly_in.py
-CONFIG_FILE = config.txt
-SRC_FILES = a_maze_ing.py config/ mazegen/ display.py
 
-all: install run
-
-install: $(VENV)/bin/activate
-
-$(VENV)/bin/activate: requirements.txt
+install:
 	python3 -m venv $(VENV)
-	@$(PIP) install --upgrade pip
-	@$(PIP) install -r requirements.txt
-	@$(PIP) install -e .
-	@touch $(VENV)/bin/activate
+	$(PIP) install --upgrade pip
+	$(PIP) install pydantic pygame rich mypy flake8
 
 run:
-	$(PYTHON) $(MAIN_FILE) $(CONFIG_FILE)
+	$(PYTHON) fly_in.py $(ARGS)
 
 debug:
-	$(PYTHON) -m pdb $(MAIN_FILE) $(CONFIG_FILE)
-
-lint:
-	@$(PYTHON) -m flake8 $(SRC_FILES)
-	@$(PYTHON) -m mypy $(SRC_FILES) \
-		--exclude "mlx/.*" \
-		--follow-imports=skip \
-		--warn-return-any \
-		--warn-unused-ignores \
-		--ignore-missing-imports \
-		--disallow-untyped-defs \
-		--check-untyped-defs
-
-lint-strict:
-	@$(PYTHON) -m flake8 $(SRC_FILES)
-	@$(PYTHON) -m mypy $(SRC_FILES) \
-		--strict \
-		--exclude "mlx/.*" \
-		--follow-imports=skip
-
-package: install
-	@$(PYTHON) -m build
+	$(PYTHON) -m pdb fly_in.py $(ARGS)
 
 clean:
-	@rm -rf __pycache__ .mypy_cache $(VENV) build dist *.egg-info
-	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	rm -rf __pycache__ src/__pycache__ src/*/__pycache__ src/*/*/__pycache__ .mypy_cache
+	rm -rf $(VENV)
 
-.PHONY: all lint clean run debug package
+lint:
+	$(FLAKE8) src/ fly_in.py
+	$(MYPY) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs src/ fly_in.py
+
+lint-strict:
+	$(FLAKE8) src/ fly_in.py
+	$(MYPY) --strict --ignore-missing-imports src/ fly_in.py

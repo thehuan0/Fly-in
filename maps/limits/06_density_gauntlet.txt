@@ -1,0 +1,29 @@
+nb_drones: 20
+start_hub: base 0 3 [color=green]
+end_hub: destination 12 3 [color=yellow]
+hub: p1 2 5 [zone=priority color=green max_drones=2]
+hub: p2 2 1 [zone=normal color=blue max_drones=2]
+hub: b_mid 3 3 [zone=blocked color=black]
+hub: hub_core 5 3 [max_drones=3 color=yellow]
+hub: bypass_top 6 6 [zone=restricted color=red]
+hub: bypass_bot 6 0 [zone=restricted color=red]
+hub: choke_in 8 3 [max_drones=2 color=orange]
+hub: b_mid2 9 3 [zone=blocked color=black]
+hub: exit_a 10 5 [zone=normal color=blue max_drones=2]
+hub: exit_b 10 1 [zone=normal color=blue max_drones=2]
+connection: base-p1 [max_link_capacity=2]
+connection: base-p2 [max_link_capacity=2]
+connection: p1-b_mid
+connection: p2-b_mid
+connection: p1-hub_core [max_link_capacity=2]
+connection: p2-hub_core [max_link_capacity=2]
+connection: hub_core-bypass_top
+connection: hub_core-bypass_bot
+connection: hub_core-choke_in [max_link_capacity=2]
+connection: bypass_top-exit_a
+connection: bypass_bot-exit_b
+connection: choke_in-b_mid2
+connection: choke_in-exit_a
+connection: choke_in-exit_b
+connection: exit_a-destination [max_link_capacity=2]
+connection: exit_b-destination [max_link_capacity=2]

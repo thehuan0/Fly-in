@@ -1,0 +1,18 @@
+[project]
+name = "fly-in"
+version = "0.1.0"
+description = "Drone routing simulation with a honeybee twist"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "jperez-s" }
+]
+dependencies = [
+    "pydantic>=2.0.0",
+    "pygame>=2.6.1",
+    "rich>=13.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

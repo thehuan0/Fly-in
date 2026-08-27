@@ -1,14 +1,23 @@
-import pygame
 import os
 from typing import Dict, List, Tuple, Union, Any
 from src.simulation.engine import SimulationEngine
 from src.models.node import Node, NodeType
 from src.models.connection import Connection
 
+try:
+    import pygame
+    PYGAME_AVAILABLE = True
+except ImportError:
+    PYGAME_AVAILABLE = False
+
 
 class GardenGUI:
     """Handles the graphical representation of the simulation."""
+
     def __init__(self, width: int = 1400, height: int = 900) -> None:
+        if not PYGAME_AVAILABLE:
+            raise ImportError("Pygame is not installed.")
+
         pygame.init()
         self.width = width
         self.height = height
@@ -49,6 +58,7 @@ class GardenGUI:
         self._load_raw_sprites()
 
     def _load_raw_sprites(self) -> None:
+        """Loads graphical assets from the assets directory."""
         asset_map = {
             "bee": "assets/bee.png",
             "beehive": "assets/beehive.png",
@@ -66,6 +76,7 @@ class GardenGUI:
     def _update_scaled_sprites(
         self, node_radius: int, drone_radius: int
     ) -> None:
+        """Rescales loaded sprites based on viewport zoom level."""
         if self.last_radius == node_radius:
             return
         self.last_radius = node_radius
@@ -82,6 +93,7 @@ class GardenGUI:
                 )
 
     def _parse_color(self, color_str: str) -> Tuple[int, int, int]:
+        """Translates text color names into RGB tuples."""
         colors_map = {
             "red": (214, 93, 104), "blue": (118, 159, 229),
             "green": (132, 191, 110), "yellow": (229, 194, 108),
@@ -100,6 +112,7 @@ class GardenGUI:
         pos: Tuple[int, int],
         center: bool = True
     ) -> None:
+        """Renders text with a contrasting background box."""
         text_surf = font.render(text, True, text_color)
         if center:
             bg_rect = text_surf.get_rect(center=pos)
@@ -115,6 +128,7 @@ class GardenGUI:
         self.screen.blit(text_surf, text_rect)
 
     def _fit_view(self, nodes: Dict[str, Node]) -> None:
+        """Adjusts zoom and offset to frame all map nodes."""
         if not nodes:
             return
         xs = [n.x for n in nodes.values()]
@@ -130,6 +144,7 @@ class GardenGUI:
         self.offset_y = min_y + grid_h / 2.0
 
     def _get_pos(self, x: int, y: int) -> Tuple[int, int]:
+        """Translates coordinate system logic to pixel screen space."""
         px = (self.width / 2) + (x - self.offset_x) * self.scale_x
         py = (self.height / 2) - (y - self.offset_y) * self.scale_y
         return (int(px), int(py))
@@ -140,6 +155,7 @@ class GardenGUI:
         node_positions: Dict[str, Tuple[int, int]],
         radius: int
     ) -> Dict[int, Tuple[int, int]]:
+        """Calculates collision-free layout for drones sharing a zone."""
         spots: Dict[int, Tuple[int, int]] = {}
         groups: Dict[str, List[Any]] = {}
         for drone in engine.drones:
@@ -177,7 +193,6 @@ class GardenGUI:
                 spots[drone.id] = (
                     int(base_x + offset_x), int(base_y + offset_y)
                 )
-
         return spots
 
     def draw(
@@ -187,6 +202,7 @@ class GardenGUI:
         connections: List[Connection],
         duration_sec: float = 1.0
     ) -> None:
+        """Executes a single turn's visual render loop with interpolation."""
         self.width, self.height = self.screen.get_size()
         self._fit_view(garden_nodes)
         node_positions = {
@@ -207,10 +223,7 @@ class GardenGUI:
                 d.id: node_positions[s_name] for d in engine.drones
             }
 
-        target_spots = self._get_parking_spots(
-            engine, node_positions, radius
-        )
-
+        target_spots = self._get_parking_spots(engine, node_positions, radius)
         frames = int(60 * duration_sec)
 
         for frame in range(frames + 1):
@@ -226,6 +239,7 @@ class GardenGUI:
             if isinstance(bg_col, tuple) and len(bg_col) == 3:
                 self.screen.fill(bg_col)
 
+            # Draw Connections
             for conn in connections:
                 pa = node_positions.get(conn.node_a.name)
                 pb = node_positions.get(conn.node_b.name)
@@ -234,6 +248,7 @@ class GardenGUI:
                     if isinstance(line_col, tuple) and len(line_col) == 3:
                         pygame.draw.line(self.screen, line_col, pa, pb, 4)
 
+            # Draw Nodes
             for name, node in garden_nodes.items():
                 pos = node_positions.get(name)
                 if not pos:
@@ -254,6 +269,7 @@ class GardenGUI:
                 if surf:
                     self.screen.blit(surf, surf.get_rect(center=pos))
                 else:
+                    # Fallback rendering if assets are missing
                     if name == engine.end_node.name:
                         color = self.colors["goal"]
                     elif "start" in name.lower():
@@ -262,7 +278,6 @@ class GardenGUI:
                         color = self.colors.get(
                             node.node_type, self.colors[NodeType.NORMAL]
                         )
-
                     if isinstance(color, tuple) and len(color) == 3:
                         shadow = (color[0]//2, color[1]//2, color[2]//2, 50)
                         pygame.draw.circle(
@@ -279,6 +294,7 @@ class GardenGUI:
                     box_color, (pos[0], pos[1] + radius + 14)
                 )
 
+            # Draw Drones
             for drone in engine.drones:
                 start_pos = self.current_spots.get(
                     drone.id, target_spots[drone.id]
@@ -312,11 +328,11 @@ class GardenGUI:
                         (px, py - dr - 12)
                     )
 
+            # Draw HUD
             sign_raw = self.raw_sprites.get("sign")
             if sign_raw:
                 sign_scaled = pygame.transform.scale(sign_raw, (240, 110))
                 self.screen.blit(sign_scaled, (15, 15))
-
                 t1 = self.font_large.render(
                     f"Turn: {engine.turn}", True, (0, 0, 0)
                 )
@@ -331,18 +347,18 @@ class GardenGUI:
                 hud_surf = pygame.Surface((220, 80), pygame.SRCALPHA)
                 hud_surf.fill((30, 30, 46, 200))
                 self.screen.blit(hud_surf, (15, 15))
-
                 line_col = self.colors.get("line")
                 if isinstance(line_col, tuple) and len(line_col) == 3:
                     pygame.draw.rect(
                         self.screen, line_col,
                         pygame.Rect(15, 15, 220, 80), width=2, border_radius=4
                     )
-
                 c_text = self.colors.get("text")
                 c_goal = self.colors.get("goal")
-                if (isinstance(c_text, tuple) and len(c_text) == 3 and
-                        isinstance(c_goal, tuple) and len(c_goal) == 3):
+                if (
+                    isinstance(c_text, tuple) and len(c_text) == 3 and
+                    isinstance(c_goal, tuple) and len(c_goal) == 3
+                ):
                     self._draw_text_with_box(
                         f"Turn: {engine.turn}", self.font_large,
                         c_text, (45, 45, 55), (30, 25), center=False

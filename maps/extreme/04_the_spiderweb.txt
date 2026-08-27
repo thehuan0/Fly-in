@@ -1,0 +1,54 @@
+nb_drones: 60
+start_hub: start 0 5 [color=green]
+end_hub: escape 10 5 [color=yellow]
+
+# The Spider (Blocked Nodes) - Impassable central obstacles
+hub: spider_body 5 5 [zone=blocked color=black]
+hub: leg_tl 4 6 [zone=blocked color=black]
+hub: leg_tr 6 6 [zone=blocked color=black]
+hub: leg_bl 4 4 [zone=blocked color=black]
+hub: leg_br 6 4 [zone=blocked color=black]
+
+# The Web - Top Route (High capacity, slow transit)
+hub: top_entry 2 8 [max_drones=5 zone=restricted color=red]
+hub: top_mid 5 8 [max_drones=3 zone=priority color=blue]
+hub: top_exit 8 8 [max_drones=5 zone=restricted color=red]
+
+# The Web - Bottom Route (High capacity, slow transit)
+hub: bot_entry 2 2 [max_drones=5 zone=restricted color=red]
+hub: bot_mid 5 2 [max_drones=3 zone=priority color=blue]
+hub: bot_exit 8 2 [max_drones=5 zone=restricted color=red]
+
+# The Web - Inner Ring (Fast transit, capacity 1 chokepoints)
+hub: inner_l 2 5 [max_drones=1]
+hub: inner_t 5 7 [max_drones=1]
+hub: inner_b 5 3 [max_drones=1]
+hub: inner_r 8 5 [max_drones=1]
+
+# Connections from start
+connection: start-top_entry [max_link_capacity=3]
+connection: start-bot_entry [max_link_capacity=3]
+connection: start-inner_l [max_link_capacity=1]
+
+# Top Route Connections
+connection: top_entry-top_mid [max_link_capacity=3]
+connection: top_mid-top_exit [max_link_capacity=3]
+connection: top_exit-escape [max_link_capacity=3]
+
+# Bottom Route Connections
+connection: bot_entry-bot_mid [max_link_capacity=3]
+connection: bot_mid-bot_exit [max_link_capacity=3]
+connection: bot_exit-escape [max_link_capacity=3]
+
+# Inner Ring Connections (Squeezing past the spider)
+connection: inner_l-inner_t
+connection: inner_l-inner_b
+connection: inner_t-inner_r
+connection: inner_b-inner_r
+connection: inner_r-escape
+
+# Web Cross-Links (Baiting the heuristic)
+connection: top_mid-inner_t
+connection: bot_mid-inner_b
+connection: top_entry-inner_l
+connection: bot_entry-inner_l

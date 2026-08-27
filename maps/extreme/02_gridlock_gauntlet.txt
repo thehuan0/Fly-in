@@ -1,0 +1,29 @@
+nb_drones: 35
+start_hub: start 0 0 [color=green]
+end_hub: term 4 4 [color=yellow]
+hub: n11 1 1 [max_drones=2]
+hub: n12 1 2 [max_drones=1 zone restricted color=red]
+hub: n13 1 3 [max_drones=3]
+hub: n21 2 1 [max_drones=1 zone priority color=blue]
+hub: n22 2 2 [max_drones=2]
+hub: n23 2 3 [max_drones=1 zone restricted color=red]
+hub: n31 3 1 [max_drones=3]
+hub: n32 3 2 [max_drones=1 zone priority color=blue]
+hub: n33 3 3 [max_drones=2]
+connection: start-n11 [max_link_capacity=3]
+connection: start-n21 [max_link_capacity=2]
+connection: n11-n12
+connection: n12-n13
+connection: n11-n21
+connection: n12-n22
+connection: n13-n23
+connection: n21-n22
+connection: n22-n23
+connection: n21-n31
+connection: n22-n32
+connection: n23-n33
+connection: n31-n32
+connection: n32-n33
+connection: n13-term [max_link_capacity=2]
+connection: n31-term [max_link_capacity=2]
+connection: n33-term [max_link_capacity=3]

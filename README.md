@@ -2,10 +2,7 @@
 
 # Fly-in
 
-A drone-swarm routing simulator: route a fleet of drones from a start hub to
-an end hub across a network of zones in the fewest possible simulation turns,
-while respecting per-zone and per-connection capacity limits, zone-type
-movement costs, and collision-free turn-by-turn scheduling.
+A drone-swarm routing simulator: route a fleet of drones from a start hub to an end hub across a network of zones in the fewest possible simulation turns, while respecting per-zone and per-connection capacity limits, zone-type movement costs, and collision-free turn-by-turn scheduling.
 
 ## Description
 
@@ -91,6 +88,7 @@ connection: hub-corridorA
 connection: corridorA-goal [max_link_capacity=2]
 ```
 
+- **Metadata:**The parser uses a robust tokenizer to handle brackets with both space-separated and equals-separated values seamlessly (e.g., `[zone restricted]` or `[zone=restricted]`)
 - `zone=` — `normal` (default, 1 turn), `priority` (1 turn, preferred by the
   planner), `restricted` (2 turns, cannot be left mid-transit), or `blocked`
   (impassable).
@@ -134,10 +132,6 @@ multi-restart outer loop runs a fixed number of times. The expensive part of
 planning happens once at the start of the simulation, not on every turn —
 after that, advancing a turn is just a dictionary lookup per drone.
 
-> See `CODE_REVIEW.md` for a detailed walkthrough of where this approach is
-> strong (capacity correctness, verified independently) and where it currently
-> falls short (the stopping heuristic, plus a handful of crash/hang edge cases
-> that should be fixed before submission).
 
 ## Visual Representation
 

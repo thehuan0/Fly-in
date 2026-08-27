@@ -1,0 +1,32 @@
+nb_drones: 50
+start_hub: start 0 0 [color=green]
+end_hub: core 10 10 [color=yellow]
+hub: m1 2 0 [max_drones=5]
+hub: m2 4 0 [max_drones=2 zone restricted color=red]
+hub: dead_end1 4 2 [max_drones=10]
+hub: m3 6 0 [max_drones=3]
+hub: m4 2 2 [max_drones=2 zone priority color=blue]
+hub: m5 2 4 [max_drones=1 zone restricted color=red]
+hub: m6 4 4 [max_drones=4]
+hub: dead_end2 6 4 [max_drones=10]
+hub: m7 4 6 [max_drones=2 zone priority]
+hub: m8 6 6 [max_drones=1 zone restricted color=red]
+hub: m9 8 6 [max_drones=5]
+hub: m10 8 8 [max_drones=3]
+hub: m11 10 6 [max_drones=2]
+connection: start-m1 [max_link_capacity=5]
+connection: start-m4 [max_link_capacity=2]
+connection: m1-m2 [max_link_capacity=2]
+connection: m2-dead_end1
+connection: m2-m3
+connection: m4-m5
+connection: m5-m6 [max_link_capacity=1]
+connection: m6-dead_end2
+connection: m6-m7
+connection: m7-m8
+connection: m8-m9 [max_link_capacity=2]
+connection: m3-m9 [max_link_capacity=3]
+connection: m9-m10
+connection: m9-m11
+connection: m11-core [max_link_capacity=2]
+connection: m10-core [max_link_capacity=3]

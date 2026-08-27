@@ -1,0 +1,16 @@
+nb_drones: 20
+start_hub: start 0 2 [color=green]
+end_hub: end 10 2 [color=yellow]
+hub: stage 2 2 [max_drones=20 color=blue]
+hub: top_route 5 4 [zone restricted color=red]
+hub: mid_choke 5 2 [max_drones=1 color=purple]
+hub: bot_route 5 0 [zone priority color=blue]
+hub: bot_choke 7 0 [max_drones=1 color=gray]
+connection: start-stage
+connection: stage-top_route [max_link_capacity=2]
+connection: stage-mid_choke [max_link_capacity=1]
+connection: stage-bot_route [max_link_capacity=5]
+connection: top_route-end [max_link_capacity=2]
+connection: mid_choke-end [max_link_capacity=1]
+connection: bot_route-bot_choke [max_link_capacity=2]
+connection: bot_choke-end [max_link_capacity=1]

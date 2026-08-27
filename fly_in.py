@@ -11,11 +11,6 @@ try:
 except ImportError:
     GUI_AVAILABLE = False
 
-"""
-Main execution script for the Fly-in simulation.
-Handles argument parsing, initialization, and the main simulation loop.
-"""
-
 
 def main() -> None:
     """Main execution entry point for the Fly-in simulation."""

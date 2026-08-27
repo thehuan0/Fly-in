@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by jperez-s.*
+*This project has been created as part of the 42 curriculum by jperez-s*
 
 # Fly-in
 
@@ -88,13 +88,13 @@ connection: hub-corridorA
 connection: corridorA-goal [max_link_capacity=2]
 ```
 
-- **Metadata:**The parser uses a robust tokenizer to handle brackets with both space-separated and equals-separated values seamlessly (e.g., `[zone restricted]` or `[zone=restricted]`)
-- `zone=` — `normal` (default, 1 turn), `priority` (1 turn, preferred by the
+- **Metadata:** The parser uses a robust tokenizer to handle brackets with both space-separated and equals-separated values seamlessly (e.g., `[zone restricted]` or `[zone=restricted]`)
+- `zone` — `normal` (default, 1 turn), `priority` (1 turn, preferred by the
   planner), `restricted` (2 turns, cannot be left mid-transit), or `blocked`
   (impassable).
-- `max_drones=` — how many drones a zone may hold at once (default 1; the
+- `max_drones` — how many drones a zone may hold at once (default 1; the
   start and end hubs are exempt from this limit).
-- `max_link_capacity=` — how many drones may traverse a connection
+- `max_link_capacity` — how many drones may traverse a connection
   simultaneously (default 1).
 - Lines starting with `#` are comments.
 
@@ -107,30 +107,12 @@ surfaces a line-numbered error message on malformed input.
 
 **Pathfinding** (`src/simulation/swarm_solver.py`) treats the problem as
 search over a *time-expanded graph*: every state is `(zone, turn)`, not just
-`zone`. For each drone, a single-agent A* search explores three actions per
-state — move to a neighboring zone, wait in place, or (for a restricted
-target) commit to a forced two-turn transit — while consulting shared
-reservation tables (`node_reservations`, `link_reservations`) to reject moves
-that would exceed a zone's or connection's capacity at that turn.
+`zone`. 
+- **Spatial Heuristic:** To prevent exponential state explosion, the A* search is guided by a spatial heuristic pre-computed via a reverse Breadth-First Search (BFS) from the destination node. This ensures drones aggressively target the goal and instantly prune `blocked` paths.
 
-Because planning every drone independently and simultaneously is what causes
-collisions, drones are planned **one at a time in priority order**, each one
-reserving its turn-by-turn occupancy before the next drone is planned (a
-prioritized/cooperative-pathfinding approach). Since a poor ordering can
-produce an unnecessarily long plan — or even leave a drone stuck — the planner
-tries multiple random orderings and keeps the best result found.
+- **Prioritized Planning:** Because planning every drone independently and simultaneously causes collisions, drones are planned one at a time in priority order. Each drone reserves its turn-by-turn occupancy before the next drone is planned. To avoid deadlocks, the planner tries multiple random priority orderings and keeps the most optimal master plan.
 
-The full plan is computed once, cached, and replayed turn-by-turn by
-`SimulationEngine` (`src/simulation/engine.py`), which applies a drone's
-move, frees its old zone's capacity, and lands any drones whose two-turn
-restricted transit has elapsed — all before the next turn's moves are
-considered, matching the "movers free up space the same turn" rule.
-
-**Complexity:** each single-drone A* search is bounded by the size of the
-time-expanded graph it explores from that drone's starting state; the
-multi-restart outer loop runs a fixed number of times. The expensive part of
-planning happens once at the start of the simulation, not on every turn —
-after that, advancing a turn is just a dictionary lookup per drone.
+**Simulation** (`src/simulation/engine.py`) caches the full plan and replays it turn-by-turn. The engine strictly validates capacities, applies moves, frees old zone spaces, and lands drones whose two-turn restricted transit has elapsed—all before the next turn's moves are considered.
 
 
 ## Visual Representation
@@ -156,9 +138,5 @@ instead.
 
 ### AI usage
 
-AI assistance (Claude) was used for: reviewing the overall codebase structure
-and flagging logic/clarity issues; iterating on the pygame-based GUI
-(including the geometric-shape fallback rendering for missing sprite assets);
-and debugging specific pieces of the simulation engine and pathfinding logic.
-All AI-suggested code was read, tested, and adjusted before being kept —
-nothing was used without understanding what it does and why.
+AI assistance was used to: review the overall codebase structure and flag logic/clarity issues; iterate on the Pygame-based GUI (including the geometric-shape fallback rendering for missing sprite assets); help generate other complex maps to further test the code. All AI-suggested code was thoroughly read, strictly typed, tested, and structurally integrated manually—nothing was used without a complete understanding of its mechanics.
+🥭

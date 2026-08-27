@@ -1,4 +1,4 @@
-.PHONY: all help install run debug clean lint lint-strict
+.PHONY: install run debug clean lint lint-strict
 
 VENV = venv
 PYTHON = $(VENV)/bin/python3
@@ -10,7 +10,7 @@ MYPY = $(VENV)/bin/mypy
 install:
 	python3 -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install pydantic pygame rich mypy flake8
+	$(PIP) install pydantic pygame mypy flake8
 
 run:
 	$(PYTHON) fly_in.py $(ARGS)
